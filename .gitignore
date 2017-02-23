@@ -1,0 +1,6 @@
+*.pyc
+venv
+*.db
+*.md
+dist/
+/*.egg-info
