@@ -29,14 +29,14 @@ Example App that uses the command_line_blog module.
 
 ```python
 from flask import Flask as App
-from command_line_blog import command_line_blog as blog
+from command_line_blog import command_line_blog as blog_app, command_line_blog_posts as posts
 
 app = App(__name__)
-app.register_blueprint(blog, url_prefix='/blog', table_space='blog_posts')
+app.register_blueprint(blog_app, url_prefix='/blog')
 
 @app.route("/")
 def index():
-    return "Hello World"
+    return render_template('posts.index', posts=posts.all())
 
 if __name__=='__main__':
     app.run(debug=True)
@@ -44,8 +44,17 @@ if __name__=='__main__':
 
 ## How It Works
 
-Dataset is used to manage posts table so you don't have to define a schema in advance.
+Dataset is used to manage the posts table so you don't have to define a schema in advance.
 
-## Database Connection
+See docs for more info https://dataset.readthedocs.io/en/latest/index.html
 
-It assumes `DATABASE_URL` is set as an environment variable. Otherwise it defaults to an in memory SQLite database.
+## Configuration
+
+The following environment variables should be set.
+
+```
+export DATABASE_URL = sqlite:///database.db
+export COMMAND_LINE_BLOG_TABLE  = 'name_of_database_table'
+export COMMAND_LINE_BLOG_USER   = 'username used for basic auth'
+export COMMAND_LINE_BLOG_PWD    = 'password used for basic auth'
+```
