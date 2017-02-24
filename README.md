@@ -25,7 +25,7 @@ curl http://localhost/blog/hello-world > hello-world.md
 Edit the contents and then upload the file back up to the server. E.g.,
 
 ```
-curl -X POST http://localhost:5000/blog/hello-world` -H 'Author: Sean' -F file=@hello-world.md
+curl -X POST http://localhost:5000/blog/hello-world -H 'Author: Sean' -F file=@hello-world.md
 ```
 
 Example App that uses the command_line_blog module.
@@ -35,7 +35,7 @@ from flask import Flask as App
 from command_line_blog import command_line_blog as blog
 
 app = App(__name__)
-app.register_blueprint(blog, url_prefix='/blog')
+app.register_blueprint(blog, url_prefix='/blog', table_space='blog_posts')
 
 @app.route("/")
 def index():
@@ -51,4 +51,4 @@ Dataset is used to manage posts table so you don't have to define a schema in ad
 
 ## Database Connection
 
-It assumes `DATABASE_URL` is set as an environment variable. Otherwise it defaults to an in memory SQLite database. 
+It assumes `DATABASE_URL` is set as an environment variable. Otherwise it defaults to an in memory SQLite database.
