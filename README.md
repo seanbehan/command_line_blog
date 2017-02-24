@@ -1,3 +1,9 @@
+# Install
+
+```
+pip install command-line-blog
+```
+
 # Command Line Blog
 
 Command Line Blog is a simple API for managing posts.
