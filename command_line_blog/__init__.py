@@ -1,20 +1,22 @@
 import re
 from os import environ as env
 from datetime import datetime
-from flask import Blueprint, request, g, jsonify
+from flask import Blueprint, request, g, jsonify, Response as response
 from dataset import connect
 
-class CommandLineBlogBlueprint(Blueprint):
-    def __init__(self, *args, **kwargs):
-        self.table_space = kwargs.pop('table_space', 'command_line_blog_posts')
-        Blueprint.__init__(self, *args, **kwargs)
-
-command_line_blog = CommandLineBlogBlueprint('command_line_blog', __name__)
+command_line_blog = Blueprint('command_line_blog', __name__)
 
 @command_line_blog.before_request
 def before_request():
     g.db = connect(env.get('DATABASE_URL', 'sqlite:///:memory:'))
-    g.posts = g.db[command_line_blog.table_space]
+    g.posts = g.db[env.get('COMMAND_LINE_BLOG_TABLE', 'command_line_blog_posts')]
+
+@command_line_blog.before_request
+def require_authorized_user():
+    username, password = env.get('COMMAND_LINE_BLOG_USER', None), env.get('COMMAND_LINE_BLOG_PWD', None)
+    auth = request.authorization
+    if not auth or (auth.username != username or auth.password != password):
+        return response('Authentication required.', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
 @command_line_blog.route('/<slug>')
 def show_post_path(slug):
@@ -27,7 +29,7 @@ def show_post_path(slug):
 @command_line_blog.route("/all.json")
 def show_all_posts():
     return jsonify({
-        command_line_blog.table_space : [row for row in g.posts.all()]
+        env.get('COMMAND_LINE_BLOG_TABLE', 'command_line_blog_posts') : [row for row in g.posts.all()]
     })
 
 @command_line_blog.route('/<slug>.json')

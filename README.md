@@ -1,12 +1,9 @@
-WIP - Todos
-
-- Needs authentication
-- Customize table name
-
 # Command Line Blog
 
-Command Line Blog is a simple Flask Blueprint that adds blog management to your Flask App. It assumes you will customize the
-front end of the site and post display, using Jinja/Flask.
+Command Line Blog is a simple API for managing posts.
+
+It is a simple Flask Blueprint that adds blog management to an existing Flask App. It assumes you will customize the
+front end of the site and post display.
 
 There is no web interface for managing your posts, however. All blogging is done by editing local files and uploading
 them to your site via CURL (or other utility).
