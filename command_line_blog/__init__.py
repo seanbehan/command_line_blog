@@ -20,7 +20,7 @@ def require_authorized_user():
     if not auth or (auth.username != username or auth.password != password):
         return response('Authentication required.', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
-@command_line_blog.route('/<slug>/')
+@command_line_blog.route('/<slug>')
 def show_post_path(slug):
     post = g.posts.find_one(slug=slug)
     if post:
@@ -28,17 +28,7 @@ def show_post_path(slug):
     else:
         return "Not found"
 
-@command_line_blog.route("/all.json")
-def show_all_posts():
-    return jsonify({
-        env.get('COMMAND_LINE_BLOG_TABLE', 'command_line_blog_posts') : [row for row in g.posts.all()]
-    })
-
-@command_line_blog.route('/<slug>.json')
-def show_post_json_path(slug):
-    return jsonify(g.posts.find_one(slug=slug))
-
-@command_line_blog.route("/<slug>/", methods=["POST"])
+@command_line_blog.route("/<slug>", methods=["POST"])
 def create_post_path(slug):
     row = dict(
         update=datetime.utcnow(),
@@ -54,7 +44,7 @@ def create_post_path(slug):
 
     return jsonify(row)
 
-@command_line_blog.route("/<slug>/", methods=["DELETE"])
+@command_line_blog.route("/<slug>", methods=["DELETE"])
 def delete_post_path(slug):
     g.posts.delete(g.posts.find_one(slug=slug))
     return "Deleted"
