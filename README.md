@@ -36,7 +36,7 @@ app.register_blueprint(blog_app, url_prefix='/blog')
 
 @app.route("/")
 def index():
-    return render_template('posts.index', posts=posts.all())
+    return render_template('posts.html', posts=posts.all())
 
 if __name__=='__main__':
     app.run(debug=True)
