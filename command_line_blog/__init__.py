@@ -6,11 +6,12 @@ from dataset import connect
 
 command_line_blog = Blueprint('command_line_blog', __name__)
 command_line_blog_db = lambda: connect(env.get('DATABASE_URL', 'sqlite:///:memory:'))
+command_line_blog_posts = lambda: command_line_blog_db()[env.get('COMMAND_LINE_BLOG_TABLE', 'command_line_blog_posts')]
 
 @command_line_blog.before_request
 def before_request():
     g.db = command_line_blog_db()
-    g.posts = g.db[env.get('COMMAND_LINE_BLOG_TABLE', 'command_line_blog_posts')]
+    g.posts = command_line_blog_posts()
 
 @command_line_blog.before_request
 def require_authorized_user():
