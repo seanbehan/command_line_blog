@@ -4,15 +4,21 @@ from datetime import datetime
 from flask import Blueprint, request, g, jsonify
 from dataset import connect
 
-command_line_blog = Blueprint('command_line_blog', __name__)
+class CommandLineBlogBlueprint(Blueprint):
+    def __init__(self, *args, **kwargs):
+        self.table_space = kwargs.pop('table_space', 'command_line_blog_posts')
+        Blueprint.__init__(self, *args, **kwargs)
+
+command_line_blog = CommandLineBlogBlueprint('command_line_blog', __name__)
 
 @command_line_blog.before_request
 def before_request():
-    g.db = connect(env.get('DATABASE_URL', 'sqlite:///database.db'))
+    g.db = connect(env.get('DATABASE_URL', 'sqlite:///:memory:'))
+    g.posts = g.db[command_line_blog.table_space]
 
 @command_line_blog.route('/<slug>')
 def show_post_path(slug):
-    post = g.db['posts'].find_one(slug=slug)
+    post = g.posts.find_one(slug=slug)
     if post:
         return post['body']
     else:
@@ -20,11 +26,13 @@ def show_post_path(slug):
 
 @command_line_blog.route("/all.json")
 def show_all_posts():
-    return jsonify(posts=[row for row in g.db.query('select * from posts')])
+    return jsonify({
+        command_line_blog.table_space : [row for row in g.posts.all()]
+    })
 
 @command_line_blog.route('/<slug>.json')
 def show_post_json_path(slug):
-    return jsonify(g.db['posts'].find_one(slug=slug))
+    return jsonify(g.posts.find_one(slug=slug))
 
 @command_line_blog.route("/<slug>/", methods=["POST"])
 def create_post_path(slug):
@@ -38,11 +46,11 @@ def create_post_path(slug):
     if request.files.get('file', None):
         row['body'] = request.files['file'].read()
 
-    g.db['posts'].upsert(row, ['slug'])
+    g.posts.upsert(row, ['slug'])
 
     return jsonify(row)
 
 @command_line_blog.route("/<slug>/", methods=["DELETE"])
 def delete_post_path(slug):
-    g.db['posts'].delete(g.db['posts'].find_one(slug=slug))
+    g.posts.delete(g.posts.find_one(slug=slug))
     return "Deleted"

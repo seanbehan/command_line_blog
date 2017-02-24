@@ -1,7 +1,6 @@
 WIP - Todos
 
 - Needs authentication
-- Tagging
 - Customize table name
 
 # Command Line Blog
@@ -17,9 +16,17 @@ You simply make a POST request to the endpoint and it will perform an upsert. If
 You can add attributes to your posts with headers, e.g., `-H 'Author: Sean'`. Header keys are snaked case. So you would
 use `{{post.author}}` in your Jinja templates.
 
-To edit an existing post, simply download the contents via curl to a local file. E.g., `curl http://localhost/blog/hello-world > hello-world.md`.
+To edit an existing post, simply download the contents via curl to a local file. E.g.,
 
-Edit the contents and then upload the file back up to the server. E.g., `curl -X POST http://localhost:5000/blog/hello-world` -H 'Author: Sean' -F file=@hello-world.md`
+```
+curl http://localhost/blog/hello-world > hello-world.md
+```
+
+Edit the contents and then upload the file back up to the server. E.g.,
+
+```
+curl -X POST http://localhost:5000/blog/hello-world` -H 'Author: Sean' -F file=@hello-world.md
+```
 
 Example App that uses the command_line_blog module.
 
@@ -42,7 +49,6 @@ if __name__=='__main__':
 
 Dataset is used to manage posts table so you don't have to define a schema in advance.
 
-`curl http://localhost:5000/blog`
-Save contents of hello-world.md file to /hello-world
-`curl http://localhost:5000/blog/hello-world` -H 'Author: Sean' -F @hello-word.md`
-Get content `curl http://localhost:5000/blog/hello-world`
+## Database Connection
+
+It assumes `DATABASE_URL` is set as an environment variable. Otherwise it defaults to an in memory SQLite database. 
