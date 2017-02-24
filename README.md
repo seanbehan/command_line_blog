@@ -2,13 +2,13 @@
 
 Command Line Blog is a simple API for managing posts.
 
-It is a simple Flask Blueprint that adds blog management to an existing Flask App. It assumes you will customize the
+It is a Flask Blueprint that adds blog management to an existing Flask App. It assumes you will customize the
 front end of the site and post display.
 
-There is no web interface for managing your posts, however. All blogging is done by editing local files and uploading
-them to your site via CURL (or other utility).
+There is no web interface for managing your posts. All blogging is done by editing local files and uploading
+them to your site using CURL (or other utility).
 
-You simply make a POST request to the endpoint and it will perform an upsert. If there is already a post with the slug in the database, it will update the content. If not, a new post will be created.
+Make a POST request to the endpoint and it will perform an upsert. If there is already a post in the database at the path, it will update the content. If not, a new post will be created.
 
 You can add attributes to your posts with headers, e.g., `-H 'Author: Sean'`. Header keys are snaked case. So you would
 use `{{post.author}}` in your Jinja templates.

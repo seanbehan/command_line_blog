@@ -5,10 +5,11 @@ from flask import Blueprint, request, g, jsonify, Response as response
 from dataset import connect
 
 command_line_blog = Blueprint('command_line_blog', __name__)
+command_line_blog_db = lambda: connect(env.get('DATABASE_URL', 'sqlite:///:memory:'))
 
 @command_line_blog.before_request
 def before_request():
-    g.db = connect(env.get('DATABASE_URL', 'sqlite:///:memory:'))
+    g.db = command_line_blog_db()
     g.posts = g.db[env.get('COMMAND_LINE_BLOG_TABLE', 'command_line_blog_posts')]
 
 @command_line_blog.before_request
@@ -18,7 +19,7 @@ def require_authorized_user():
     if not auth or (auth.username != username or auth.password != password):
         return response('Authentication required.', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
-@command_line_blog.route('/<slug>')
+@command_line_blog.route('/<slug>/')
 def show_post_path(slug):
     post = g.posts.find_one(slug=slug)
     if post:
