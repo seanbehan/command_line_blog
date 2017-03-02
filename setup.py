@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='command_line_blog',
-      version='0.1.4',
+      version='0.1.5',
       description='Publish to the web with just curl!',
       url='http://github.com/seanbehan/command_line_blog',
       author='Sean Behan',

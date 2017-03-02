@@ -1,17 +1,12 @@
 import re
 from os import environ as env
 from datetime import datetime
-from flask import Blueprint, request, g, jsonify, Response as response
+from flask import Blueprint, request, jsonify, Response as response
 from dataset import connect
 
 command_line_blog = Blueprint('command_line_blog', __name__)
-command_line_blog_db = lambda: connect(env.get('DATABASE_URL', 'sqlite:///:memory:'))
-command_line_blog_posts = lambda: command_line_blog_db()[env.get('COMMAND_LINE_BLOG_TABLE', 'command_line_blog_posts')]
-
-@command_line_blog.before_request
-def before_request():
-    g.db = command_line_blog_db()
-    g.posts = command_line_blog_posts()
+command_line_blog_db = connect(env.get('DATABASE_URL', 'sqlite:///:memory:'))
+command_line_blog_posts = command_line_blog_db()[env.get('COMMAND_LINE_BLOG_TABLE', 'command_line_blog_posts')]
 
 @command_line_blog.before_request
 def require_authorized_user():
@@ -22,7 +17,7 @@ def require_authorized_user():
 
 @command_line_blog.route('/<slug>')
 def show_post_path(slug):
-    post = g.posts.find_one(slug=slug)
+    post = command_line_blog_posts.find_one(slug=slug)
     if post:
         return post['body']
     else:
@@ -40,11 +35,10 @@ def create_post_path(slug):
     if request.files.get('file', None):
         row['body'] = request.files['file'].read()
 
-    g.posts.upsert(row, ['slug'])
-
+    command_line_blog_posts.upsert(row, ['slug'])
     return jsonify(row)
 
 @command_line_blog.route("/<slug>", methods=["DELETE"])
 def delete_post_path(slug):
-    g.posts.delete(g.posts.find_one(slug=slug))
+    command_line_blog_posts.delete(command_line_blog_posts.find_one(slug=slug))
     return "Deleted"
